@@ -1,0 +1,65 @@
+body {
+  margin: 0;
+  padding: 0;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Helvetica Neue', Arial, sans-serif;
+}
+
+#root {
+  min-height: 100vh;
+}
+
+.login-container {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+
+  .login-card {
+    width: 400px;
+    padding: 30px;
+    background: #fff;
+    border-radius: 8px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+
+    .login-title {
+      text-align: center;
+      font-size: 24px;
+      font-weight: bold;
+      margin-bottom: 30px;
+      color: #333;
+    }
+  }
+}
+
+.resize-layout {
+  display: flex;
+  height: 100%;
+
+  .resize-left {
+    flex-shrink: 0;
+    overflow: auto;
+  }
+
+  .resize-bar {
+    width: 6px;
+    flex-shrink: 0;
+    cursor: col-resize;
+    background: #e8e8e8;
+    transition: background 0.2s;
+
+    &:hover {
+      background: #1890ff;
+    }
+  }
+
+  .resize-right {
+    flex: 1;
+    min-width: 0;
+    overflow: auto;
+  }
+}

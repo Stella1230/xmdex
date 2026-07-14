@@ -1,0 +1,132 @@
+// ✅ REAP规范适配 - 样式体系统一：scss 改为 less
+
+.logo {
+  height: 64px;
+  line-height: 64px;
+  text-align: center;
+  font-size: 20px;
+  font-weight: bold;
+  color: #fff;
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 16px;
+  background: #fff;
+  box-shadow: 0 1px 4px rgba(0, 21, 41, 0.08);
+
+  .header-left {
+    .trigger {
+      font-size: 18px;
+      cursor: pointer;
+      transition: color 0.3s;
+      &:hover {
+        color: #1890ff;
+      }
+    }
+  }
+
+  .header-right {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+
+    .bell-icon {
+      font-size: 18px;
+      cursor: pointer;
+    }
+
+    .user-info {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      cursor: pointer;
+
+      .username {
+        max-width: 80px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
+    }
+  }
+}
+
+.content {
+  margin: 16px;
+  padding: 0;
+  background: #fff;
+  min-height: calc(100vh - 112px);
+  display: flex;
+  flex-direction: column;
+
+  .ant-tabs-card {
+    background: #fff;
+    padding: 0 16px;
+
+    .ant-tabs-nav {
+      margin-bottom: 0;
+    }
+  }
+
+  .page-content {
+    padding: 16px;
+    flex: 1;
+    overflow: auto;
+  }
+}
+
+.ant-menu-dark {
+  background: #001529;
+}
+
+.profile-section {
+  .profile-header {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid #f0f0f0;
+  }
+
+  .profile-name {
+    font-size: 18px;
+    font-weight: 600;
+    color: #333;
+  }
+}
+
+.pwd-section {
+  margin-top: 20px;
+
+  .pwd-title {
+    font-size: 15px;
+    font-weight: 600;
+    color: #333;
+  }
+
+  .pwd-submit-btn {
+    padding: 4px 24px;
+    font-size: 14px;
+    color: #fff;
+    background: #1890ff;
+    border: 1px solid #1890ff;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: all 0.3s;
+
+    &:hover {
+      background: #40a9ff;
+      border-color: #40a9ff;
+    }
+
+    &:disabled {
+      background: #d9d9d9;
+      border-color: #d9d9d9;
+      cursor: not-allowed;
+    }
+  }
+}

@@ -18,7 +18,7 @@
 ## 二、目录结构
 
 ```
-todex-react/
+xmdex/
 ├── public/                        # 静态资源目录
 ├── src/
 │   ├── assets/                    # 资源目录
