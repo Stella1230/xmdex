@@ -65,26 +65,32 @@ const service = axios.create({
 })
 
 service.interceptors.request.use(
-  config => {
-    const token = localStorage.getItem('token')
-    if (token) {
-      config.headers['Authorization'] = `Bearer ${token}`
-    }
-    if (config.data && !(config.data instanceof FormData)) {
-      config.headers['Content-Type'] = 'application/x-www-form-urlencoded'
-      const urlPath = config.url.replace('.do', '').replace('/', '')
-      const requestBody = {
-        REQ_HEAD: {
-          TRANS_PROCESS: urlPath,
-          TRAN_ID: generateTraceNo()
-        },
-        REQ_BODY: config.data
+  service.interceptors.request.use(
+    config => {
+      const token = localStorage.getItem('token')
+      if (config.data && !(config.data instanceof FormData)) {
+        config.headers['Content-Type'] = 'application/x-www-form-urlencoded'
+        const urlPath = config.url.replace('.do', '').replace('/', '')
+  
+        // 非登录接口，将 token 注入 REQ_BODY
+        let reqBody = config.data
+        if (token && !config.url.includes('handleLogin')) {
+          reqBody = { ...config.data, token }
+        }
+  
+        const requestBody = {
+          REQ_HEAD: {
+            TRANS_PROCESS: urlPath,
+            TRAN_ID: generateTraceNo()
+          },
+          REQ_BODY: reqBody
+        }
+        config.data = `REQ_MESSAGE=${encodeURIComponent(JSON.stringify(requestBody))}`
       }
-      config.data = `REQ_MESSAGE=${encodeURIComponent(JSON.stringify(requestBody))}`
-    }
-    return config
-  },
-  error => Promise.reject(error)
+      return config
+    },
+    error => Promise.reject(error)
+  )
 )
 
 service.interceptors.response.use(

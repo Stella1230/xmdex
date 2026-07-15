@@ -21,14 +21,14 @@ const ProjectList = () => {
     { title: '项目名称', dataIndex: 'projectName', key: 'projectName', width: 200 },
     { title: '项目描述', dataIndex: 'projectDesc', key: 'projectDesc', ellipsis: true },
     { title: '完成度', dataIndex: 'completionRate', key: 'completionRate', width: 100, render: v => `${v || 0}%` },
-    { title: '创建时间', dataIndex: 'createTime', key: 'createTime', width: 180, render: v => dayjs(v).format('YYYY-MM-DD HH:mm') },
+    { title: '创建时间', dataIndex: 'createTime', key: 'createTime', width: 180, render: v => v ? dayjs(v).format('YYYY-MM-DD HH:mm') : '-' },
     {
       title: '操作', key: 'action', width: 150,
       render: (_, record) => (
         <Space>
           <Button type="link" size="small" icon={<EditOutlined />} onClick={() => handleEdit(record)}>编辑</Button>
-          <Popconfirm title="确认删除?" onConfirm={() => handleDelete(record.projectId)}>
-            <Button type="link" size="small" danger icon={<DeleteOutlined />} loading={deleteLoading === record.projectId}>删除</Button>
+          <Popconfirm title="确认删除?" onConfirm={() => handleDelete(record.id)}>
+            <Button type="link" size="small" danger icon={<DeleteOutlined />} loading={deleteLoading === record.id}>删除</Button>
           </Popconfirm>
         </Space>
       )
@@ -39,6 +39,7 @@ const ProjectList = () => {
     <div className="resize-layout">
       <div className="resize-left" style={{ width: leftWidth }}>
         <DeptTree
+          data={deptTreeData}
           onSelect={handleDeptSelect}
           selectedKeys={selectedDept ? [selectedDept] : []}
         />
@@ -62,7 +63,7 @@ const ProjectList = () => {
           <Table
             columns={columns}
             dataSource={data}
-            rowKey="projectId"
+            rowKey="id"
             loading={loading}
             pagination={{ current: pagination.current, pageSize: pagination.pageSize, total: pagination.total, onChange: handlePageChange }}
           />
@@ -71,6 +72,7 @@ const ProjectList = () => {
       <Modal title={modalTitle} open={modalVisible} onOk={handleSubmit} onCancel={() => model.setModalVisible(false)} confirmLoading={submitLoading} width={600}>
         <Form form={form} layout="vertical">
           <Form.Item name="projectId" hidden><Input /></Form.Item>
+          <Form.Item name="status" hidden><Input /></Form.Item>
           <Form.Item name="projectName" label="项目名称" rules={[{ required: true }]}><Input /></Form.Item>
           <Form.Item name="projectDesc" label="项目描述"><Input.TextArea rows={3} /></Form.Item>
           <Form.Item name="deptId" label="所属部门">

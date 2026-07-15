@@ -536,7 +536,7 @@ LIMIT :pageSize OFFSET (:pageNum - 1) * :pageSize;
 - `src/services/index.js` 负责axios实例配置、拦截器和统一导出（re-export）
 - TypeScript类型定义在 `src/services/types/` 目录，按模块拆分（common/auth/dept/role/user/project/task/menu/board.ts）
 - Mock数据在 `src/services/Mock.js`，Mock开关由 `process.env.REACT_APP_MOCK` 控制
-- 请求拦截：自动添加 `Authorization: Bearer <token>` 请求头
+- 请求拦截：自动添加 `Authorization: <token>` 请求头
 - 响应拦截：提取 `RSP_BODY.resultData`；401未授权去重跳转登录
 
 ### 6. 状态管理
@@ -564,7 +564,7 @@ LIMIT :pageSize OFFSET (:pageNum - 1) * :pageSize;
 | **基础路径** | 需在 `src/services/index.js` 中配置 `BASE_URL` |
 | **请求格式** | `{ REQ_HEAD: { TRANS_PROCESS, TRAN_ID }, REQ_BODY: {...} }` |
 | **响应格式** | `{ RSP_BODY: { resultData }, RSP_HEAD: { TRAN_SUCCESS } }` |
-| **认证** | Header: `Authorization: Bearer <token>` |
+| **认证** | Header: `Authorization: <token>` |
 | **错误码** | 401：未登录/token过期；其他：业务错误 |
 | **时间格式** | Java `toString()` 格式（如 `Mon Jul 14 10:30:00 CST 2025`），前端 `parseTime()` 自动转换 |
 

@@ -15,7 +15,7 @@ const TaskTodo = () => {
   const model = useTaskTodoModel()
   const {
     loading, data, projects, selectedDept, selectedDeptName, modalVisible, modalTitle,
-    submitLoading, editingRecord, form, pagination,
+    submitLoading, editingRecord, form, pagination, deptTreeData,
     canAdd, canEdit, canDelete, canUpdateStatusOnly, filteredUsers,
     handleDeptSelect, handleQuery, handleAdd, handleEdit, handleStatusUpdate,
     handleDelete, handleSubmit, handlePageChange
@@ -30,7 +30,7 @@ const TaskTodo = () => {
     { title: '状态', dataIndex: 'status', key: 'status', width: 80, render: v => getStatusTag(v) },
     { title: '计划完成时间', dataIndex: 'planFinishTime', key: 'planFinishTime', width: 120, render: v => v ? dayjs(v).format('MM-DD') : '-' },
     { title: '实际完成时间', dataIndex: 'finishTime', key: 'finishTime', width: 120, render: v => v ? dayjs(v).format('MM-DD HH:mm') : '-' },
-    { title: '创建时间', dataIndex: 'createTime', key: 'createTime', width: 150, render: v => dayjs(v).format('YYYY-MM-DD HH:mm') },
+    { title: '创建时间', dataIndex: 'createTime', key: 'createTime', width: 150, render: v => v ? dayjs(v).format('YYYY-MM-DD HH:mm') : '-' },
     {
       title: '操作', key: 'action', width: 200,
       render: (_, record) => (
@@ -96,6 +96,7 @@ const TaskTodo = () => {
     <div className="resize-layout">
       <div className="resize-left" style={{ width: leftWidth }}>
         <DeptTree
+          data={deptTreeData}
           onSelect={handleDeptSelect}
           selectedKeys={selectedDept ? [selectedDept] : []}
         />

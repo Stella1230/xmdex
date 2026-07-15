@@ -46,12 +46,17 @@ const useUserModel = () => {
   }, [selectedDept])
 
   const initPage = async () => {
-    await fetchDeptTreeData()
+    const list = await fetchDeptTreeData()
     await fetchRoles()
-    if (!isInitializedRef.current) {
-      isInitializedRef.current = true
-    } else if (selectedDept) {
-      await fetchData({ pageNum: 1 })
+    let deptIdToFetch = selectedDept
+    if (!deptIdToFetch && list.length > 0) {
+      deptIdToFetch = list[0].id
+      setSelectedDept(deptIdToFetch)
+      setSelectedDeptName(list[0].deptName)
+    }
+    isInitializedRef.current = true
+    if (deptIdToFetch) {
+      await fetchData({ pageNum: 1, deptId: deptIdToFetch })
     }
   }
 
@@ -66,7 +71,8 @@ const useUserModel = () => {
 
   const fetchDeptTreeData = async () => {
     try {
-      const res = await getDeptTree({})
+      const deptId = localStorage.getItem('deptId')
+      const res = await getDeptTree({ deptId:deptId })
       const list = Array.isArray(res) ? res : (res && typeof res === 'object' ? Object.values(res).filter(Boolean) : [])
       const map = {}
       const buildMap = (nodes) => {
@@ -81,12 +87,10 @@ const useUserModel = () => {
           children: c.children ? c.children.map(gc => ({ key: gc.id, value: gc.id, title: gc.deptName, children: [] })) : []
         })) : []
       })))
-      if (!isInitializedRef.current && list.length > 0) {
-        setSelectedDept(list[0].id)
-        setSelectedDeptName(list[0].deptName)
-      }
+      return list
     } catch (e) {
       console.error(e)
+      return []
     }
   }
 
@@ -99,10 +103,11 @@ const useUserModel = () => {
     setLoading(true)
     try {
       const { current, pageSize } = paginationRef.current
-      const query = { pageNum: params.pageNum || current, pageSize: params.pageSize || pageSize, ...params, deptId: selectedDept }
+      const query = { pageNum: params.pageNum || current, pageSize: params.pageSize || pageSize, ...params, deptId: params.deptId || selectedDept }
       const res = await getUserList(query)
-      setData(res.rows || [])
-      setPagination(prev => ({ ...prev, total: res.total, ...params }))
+      const pageData = res.resultData || res
+      setData(pageData.content || pageData.rows || [])
+      setPagination(prev => ({ ...prev, total: pageData.totalElements || pageData.total || 0, ...params }))
     } catch (e) {
       console.error(e)
     } finally {
@@ -136,7 +141,7 @@ const useUserModel = () => {
   const handleEdit = (record) => {
     setModalTitle('编辑用户')
     setEditingId(record.id)
-    form.setFieldsValue({ ...record, userName: record.username })
+    form.setFieldsValue({ ...record, userId: record.id, sex: record.sex || undefined })
     setModalVisible(true)
   }
 
@@ -169,7 +174,7 @@ const useUserModel = () => {
       setSubmitLoading(true)
       try {
         if (editingId) {
-          await updateUser(values)
+          await updateUser({ ...values, id: editingId })
           message.success('更新成功')
         } else {
           await addUser(values)
@@ -198,7 +203,7 @@ const useUserModel = () => {
     pagination, deptTreeData,
     handleDeptSelect, handleSearch, handleReset, handleAdd, handleEdit,
     handleDelete, handleResetPwd, handleSubmit, handlePageChange,
-    setSelectedDept, setSelectedDeptName
+    setSelectedDept, setSelectedDeptName, setModalVisible
   }
 }
 

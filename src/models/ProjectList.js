@@ -33,7 +33,7 @@ const useProjectListModel = () => {
   const isInitializedRef = useRef(!!cached)
 
   useEffect(() => {
-    fetchDeptTreeData()
+    initPage()
     return () => {
       setPageCache(CACHE_KEY, { selectedDept, selectedDeptName, pagination, queryParams })
     }
@@ -45,28 +45,40 @@ const useProjectListModel = () => {
   }, [selectedDept, selectedDeptName, pagination, queryParams])
 
   useEffect(() => {
+    if (!selectedDept) return
     if (!isInitializedRef.current) return
     paginationRef.current = { ...paginationRef.current, current: 1 }
     setPagination(prev => ({ ...prev, current: 1 }))
     fetchData()
   }, [selectedDept])
 
-  useEffect(() => {
-    if (isInitializedRef.current || cached) return
-    if (deptTreeData.length > 0) {
-      isInitializedRef.current = true
-      setSelectedDept(deptTreeData[0].key)
-      setSelectedDeptName(deptTreeData[0].title)
-    }
-  }, [deptTreeData])
+
 
   const fetchDeptTreeData = async () => {
     try {
-      const res = await getDeptTree({})
-      const tree = transformTreeData(Array.isArray(res) ? res : [])
+      const deptId = localStorage.getItem('deptId')
+      const res = await getDeptTree({ deptId:deptId })
+      const list = Array.isArray(res) ? res : (res && typeof res === 'object' ? Object.values(res).filter(Boolean) : [])
+      const tree = transformTreeData(list)
       setDeptTreeData(tree)
+      return list
     } catch (e) {
       console.error(e)
+      return []
+    }
+  }
+
+  const initPage = async () => {
+    const list = await fetchDeptTreeData()
+    let deptIdToFetch = selectedDept
+    if (!deptIdToFetch && list.length > 0) {
+      deptIdToFetch = list[0].id
+      setSelectedDept(deptIdToFetch)
+      setSelectedDeptName(list[0].deptName)
+    }
+    isInitializedRef.current = true
+    if (deptIdToFetch) {
+      fetchData({ pageNum: 1, deptId: deptIdToFetch })
     }
   }
 
@@ -74,10 +86,11 @@ const useProjectListModel = () => {
     setLoading(true)
     try {
       const p = { ...paginationRef.current, ...params }
-      const query = { pageNum: p.current, pageSize: p.pageSize, ...queryParams, deptId: selectedDept }
+      const query = { pageNum: p.current, pageSize: p.pageSize, ...queryParams, deptId: params.deptId || selectedDept }
       const res = await getTodoProjectList(query)
-      setData(res.rows || [])
-      const newPag = { current: p.current, pageSize: p.pageSize, total: res.total || 0 }
+      const pageData = res.resultData || res
+      setData(pageData.content || pageData.rows || [])
+      const newPag = { current: p.current, pageSize: p.pageSize, total: pageData.totalElements || pageData.total || 0 }
       paginationRef.current = newPag
       setPagination(newPag)
     } catch (e) {
@@ -123,8 +136,8 @@ const useProjectListModel = () => {
   const handleEdit = async (record) => {
     setModalTitle('编辑项目')
     try {
-      const res = await getTodoProject({ id: record.projectId })
-      form.setFieldsValue(res)
+      const res = await getTodoProject({ id: record.id })
+      form.setFieldsValue({ ...res, projectId: record.id })
       setModalVisible(true)
     } catch (e) {
       console.error(e)
@@ -176,7 +189,7 @@ const useProjectListModel = () => {
     loading, deleteLoading, data, selectedDept, selectedDeptName, modalVisible, modalTitle,
     submitLoading, form, pagination, deptTreeData,
     handleQuery, handleDeptSelect, handleAdd, handleEdit, handleDelete,
-    handleSubmit, handlePageChange, setSelectedDept
+    handleSubmit, handlePageChange, setSelectedDept, setModalVisible
   }
 }
 

@@ -46,15 +46,16 @@ const useDeptModel = () => {
 
   const initPage = async () => {
     const treeData = await fetchDeptTree()
-    if (!isInitializedRef.current && treeData.length > 0) {
+    if (treeData.length > 0) {
       const firstId = treeData[0].id
       const firstName = treeData[0].deptName
+      // 始终确保有默认选中（缓存无值时用第一个根节点）
+      if (!selectedDept) {
+        setSelectedDept(firstId)
+        setSelectedDeptName(firstName)
+      }
       isInitializedRef.current = true
-      setSelectedDept(firstId)
-      setSelectedDeptName(firstName)
-      await fetchData({ pageNum: 1, rootId: firstId })
-    } else if (isInitializedRef.current && selectedDept) {
-      await fetchData({ pageNum: 1, rootId: selectedDept })
+      await fetchData({ pageNum: 1, parentId: selectedDept || firstId })
     }
   }
 
@@ -85,7 +86,7 @@ const useDeptModel = () => {
         ...params
       }
       if (selectedDept) {
-        query.rootId = selectedDept
+        query.parentId = selectedDept
       }
       const res = await getDeptList(query)
       let list = []
@@ -114,7 +115,8 @@ const useDeptModel = () => {
 
   const fetchDeptTree = async () => {
     try {
-      const res = await getDeptTree({})
+      const deptId = localStorage.getItem('deptId')
+      const res = await getDeptTree({ deptId:deptId })
       let treeData = []
       if (Array.isArray(res)) {
         treeData = res
@@ -145,7 +147,7 @@ const useDeptModel = () => {
     setSelectedDept(null)
     setSelectedDeptName('')
     setPagination(prev => ({ ...prev, current: 1 }))
-    fetchData({ pageNum: 1, rootId: null })
+    fetchData({ pageNum: 1, parentId: null })
   }
 
   const handleAddTop = () => {

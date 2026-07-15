@@ -52,7 +52,7 @@ const useTaskTodoModel = () => {
   useEffect(() => {
     fetchProjects()
     fetchUsers()
-    fetchDeptTree()
+    initPage()
     return () => {
       setPageCache(CACHE_KEY, { selectedDept, selectedDeptName, pagination, queryParams })
     }
@@ -63,6 +63,7 @@ const useTaskTodoModel = () => {
   }, [selectedDept, selectedDeptName, pagination, queryParams])
 
   useEffect(() => {
+    if (!selectedDept) return
     if (!isInitializedRef.current) return
     paginationRef.current = { ...paginationRef.current, current: 1 }
     setPagination(prev => ({ ...prev, current: 1 }))
@@ -70,9 +71,9 @@ const useTaskTodoModel = () => {
   }, [selectedDept])
 
   const fetchDeptTree = async () => {
-    if (cached) return
     try {
-      const res = await getDeptTree({})
+      const deptId = localStorage.getItem('deptId')
+      const res = await getDeptTree({ deptId:deptId })
       let treeData = []
       if (Array.isArray(res)) {
         treeData = res
@@ -80,13 +81,24 @@ const useTaskTodoModel = () => {
         treeData = Object.values(res).filter(Boolean)
       }
       setDeptTreeData(treeData)
-      if (!isInitializedRef.current && treeData.length > 0) {
-        isInitializedRef.current = true
-        setSelectedDept(treeData[0].id)
-        setSelectedDeptName(treeData[0].deptName)
-      }
+      return treeData
     } catch (e) {
       console.error(e)
+      return []
+    }
+  }
+
+  const initPage = async () => {
+    const treeList = await fetchDeptTree()
+    let deptIdToFetch = selectedDept
+    if (!deptIdToFetch && treeList.length > 0) {
+      deptIdToFetch = treeList[0].id
+      setSelectedDept(deptIdToFetch)
+      setSelectedDeptName(treeList[0].deptName)
+    }
+    isInitializedRef.current = true
+    if (deptIdToFetch) {
+      fetchData({ pageNum: 1, deptId: deptIdToFetch })
     }
   }
 
@@ -94,10 +106,11 @@ const useTaskTodoModel = () => {
     setLoading(true)
     try {
       const p = { ...paginationRef.current, ...params }
-      const query = { pageNum: p.current, pageSize: p.pageSize, ...queryParams, deptId: selectedDept }
+      const query = { pageNum: p.current, pageSize: p.pageSize, ...queryParams, deptId: params.deptId || selectedDept }
       const res = await getTodoTaskList(query)
-      setData(res.rows || [])
-      const newPag = { current: p.current, pageSize: p.pageSize, total: res.total || 0 }
+      const pageData = res.resultData || res
+      setData(pageData.content || pageData.rows || [])
+      const newPag = { current: p.current, pageSize: p.pageSize, total: pageData.totalElements || pageData.total || 0 }
       paginationRef.current = newPag
       setPagination(newPag)
     } catch (e) {
@@ -110,7 +123,8 @@ const useTaskTodoModel = () => {
   const fetchProjects = async () => {
     try {
       const res = await getTodoProjectList({ pageNum: 1, pageSize: 100 })
-      setProjects(res.rows || [])
+      const pageData = res.resultData || res
+      setProjects(pageData.content || pageData.rows || [])
     } catch (e) {
       console.error(e)
     }
@@ -119,7 +133,8 @@ const useTaskTodoModel = () => {
   const fetchUsers = async () => {
     try {
       const res = await getUserList({ pageNum: 1, pageSize: 100 })
-      setUsers(res.rows || [])
+      const pageData = res.resultData || res
+      setUsers(pageData.content || pageData.rows || [])
     } catch (e) {
       console.error(e)
     }
@@ -142,7 +157,14 @@ const useTaskTodoModel = () => {
   }, [deptTreeData])
 
   const handleQuery = (values) => {
-    setQueryParams(values)
+    const formatted = { ...values }
+    if (formatted.dateRange && formatted.dateRange[0]) {
+      formatted.dateRange = [
+        formatted.dateRange[0].format('YYYY-MM-DD'),
+        formatted.dateRange[1].format('YYYY-MM-DD')
+      ]
+    }
+    setQueryParams(formatted)
     paginationRef.current = { ...paginationRef.current, current: 1 }
     setPagination(prev => ({ ...prev, current: 1 }))
     fetchData({ pageNum: 1 })
@@ -228,10 +250,10 @@ const useTaskTodoModel = () => {
 
   return {
     loading, data, projects, users, selectedDept, selectedDeptName, modalVisible, modalTitle,
-    submitLoading, editingRecord, form, pagination, queryParams,
+    submitLoading, editingRecord, form, pagination, queryParams, deptTreeData,
     isAdmin, canAdd, canEdit, canDelete, canUpdateStatusOnly, filteredUsers,
     handleDeptSelect, handleQuery, handleAdd, handleEdit, handleStatusUpdate,
-    handleDelete, handleSubmit, handlePageChange, setSelectedDept
+    handleDelete, handleSubmit, handlePageChange, setSelectedDept, setModalVisible
   }
 }
 

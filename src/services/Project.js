@@ -9,6 +9,6 @@ export const getTodoProject = (data) => MOCK_MODE ? mockRequest('/todo/project/g
 
 export const addTodoProject = (data) => MOCK_MODE ? mockRequest('/todo/project/add.do', { method: 'POST', data }) : service.post('/createProject.do', data)
 
-export const updateTodoProject = (data) => MOCK_MODE ? mockRequest('/todo/project/update.do', { method: 'POST', data }) : service.post('/modifyProject.do', data)
+export const updateTodoProject = (data) => MOCK_MODE ? mockRequest('/todo/project/update.do', { method: 'POST', data }) : service.post('/modifyProject.do', { ...data, id: data.projectId })
 
 export const deleteTodoProject = (data) => MOCK_MODE ? mockRequest('/todo/project/delete.do', { method: 'POST', data: { id: data.id } }) : service.post('/removeProject.do', { id: data.id })

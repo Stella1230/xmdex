@@ -9,7 +9,7 @@ export interface UserListParams extends PaginationParams {
 }
 
 export interface AddUserRequest {
-  userName: string
+  username: string
   name: string
   deptId: string
   roleId: string
@@ -19,7 +19,7 @@ export interface AddUserRequest {
 
 export interface UpdateUserRequest {
   userId?: string
-  userName: string
+  username: string
   name: string
   deptId: string
   roleId: string

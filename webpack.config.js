@@ -3,7 +3,10 @@ const HtmlWebpackPlugin = require('html-webpack-plugin')
 const webpack = require('webpack')
 
 module.exports = (env, argv) => {
-  const isMock = argv.mode === 'development' || process.env.REACT_APP_MOCK === 'true'
+  // const isMock = argv.mode === 'development' || process.env.REACT_APP_MOCK === 'true'
+  
+  const isMock = process.env.REACT_APP_MOCK === 'true'  // 真实联调环境
+
 
   return {
     entry: './src/index.js',

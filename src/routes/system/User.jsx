@@ -24,6 +24,7 @@ const User = () => {
     { title: '用户名', dataIndex: 'username', key: 'username', width: 120, ellipsis: true },
     { title: '姓名', dataIndex: 'name', key: 'name', width: 100, ellipsis: true },
     { title: '部门', dataIndex: 'deptId', key: 'deptId', width: 150, render: v => deptMap[v] || v || '-', ellipsis: true },
+    { title: '性别', dataIndex: 'sex', key: 'sex', width: 80, render: v => v === '1' ? '男' : v === '2' ? '女' : '-' },
     { title: '手机', dataIndex: 'phone', key: 'phone', width: 130 },
     { title: '创建时间', dataIndex: 'createTime', key: 'createTime', width: 160, render: v => parseTime(v) },
     {
@@ -46,6 +47,7 @@ const User = () => {
     <div className="resize-layout">
       <div className="resize-left" style={{ width: leftWidth }}>
         <DeptTree
+          data={deptTreeData}
           onSelect={handleDeptSelect}
           selectedKeys={selectedDept ? [selectedDept] : []}
         />
@@ -89,7 +91,7 @@ const User = () => {
       <Modal title={modalTitle} open={modalVisible} onOk={handleSubmit} onCancel={() => model.setModalVisible(false)} confirmLoading={submitLoading} width={600}>
         <Form form={form} layout="vertical">
           <Form.Item name="userId" hidden><Input /></Form.Item>
-          <Form.Item name="userName" label="用户名" rules={[{ required: true }]}>
+          <Form.Item name="username" label="用户名" rules={[{ required: true }]}>
             <Input disabled={!!editingId} />
           </Form.Item>
           <Form.Item name="name" label="姓名" rules={[{ required: true, message: '请输入姓名' }]}><Input /></Form.Item>
@@ -99,6 +101,13 @@ const User = () => {
           <Form.Item name="roleId" label="角色" rules={[{ required: true, message: '请选择角色' }]}>
             <Select placeholder="请选择角色" allowClear>
               {roles.filter(r => r.id !== 'ROLE_ADMIN').map(r => <Option key={r.id} value={r.id}>{r.roleName}</Option>)}
+            </Select>
+          </Form.Item>
+          <Form.Item name="sex" label="性别">
+            <Select placeholder="请选择性别" allowClear>
+              <Option value="0">未知</Option>
+              <Option value="1">男</Option>
+              <Option value="2">女</Option>
             </Select>
           </Form.Item>
           <Form.Item name="phone" label="手机"><Input /></Form.Item>
