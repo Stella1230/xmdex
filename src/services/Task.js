@@ -1,11 +1,8 @@
-import { service, MOCK_MODE } from './index'
-import { mockApi } from './Mock'
-
-const mockRequest = (url, options) => mockApi(url, options)
+import { service, MOCK_MODE, mockRequest } from './index'
 
 export const getTodoTaskList = (data) => MOCK_MODE ? mockRequest('/todo/task/list.do', { method: 'POST', data }) : service.post('/queryTaskList.do', data)
 
-export const getTodoTask = (data) => MOCK_MODE ? mockRequest('/todo/task/getTask.do', { method: 'POST', data: { id: data.id } }) : service.post('/getTaskDetail.do', { id: data.id })
+export const getTodoTask = (data) => MOCK_MODE ? mockRequest('/todo/task/getTask.do', { method: 'POST', data: { id: data.id } }) : service.post('/queryTaskDetail.do', { id: data.id })
 
 export const addTodoTask = (data) => MOCK_MODE ? mockRequest('/todo/task/add.do', { method: 'POST', data }) : service.post('/createTask.do', data)
 

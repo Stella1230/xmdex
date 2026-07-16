@@ -27,6 +27,7 @@ function formatDate(dateStr) {
 
 function formatDateFields(obj) {
   if (!obj || typeof obj !== 'object') return obj
+  if (Array.isArray(obj)) return obj.map(item => formatDateFields(item))
   const newObj = {}
   for (const key in obj) {
     if (obj.hasOwnProperty(key)) {
@@ -65,32 +66,30 @@ const service = axios.create({
 })
 
 service.interceptors.request.use(
-  service.interceptors.request.use(
-    config => {
-      const token = localStorage.getItem('token')
-      if (config.data && !(config.data instanceof FormData)) {
-        config.headers['Content-Type'] = 'application/x-www-form-urlencoded'
-        const urlPath = config.url.replace('.do', '').replace('/', '')
-  
-        // 非登录接口，将 token 注入 REQ_BODY
-        let reqBody = config.data
-        if (token && !config.url.includes('handleLogin')) {
-          reqBody = { ...config.data, token }
-        }
-  
-        const requestBody = {
-          REQ_HEAD: {
-            TRANS_PROCESS: urlPath,
-            TRAN_ID: generateTraceNo()
-          },
-          REQ_BODY: reqBody
-        }
-        config.data = `REQ_MESSAGE=${encodeURIComponent(JSON.stringify(requestBody))}`
+  config => {
+    const token = localStorage.getItem('token')
+    if (config.data && !(config.data instanceof FormData)) {
+      config.headers['Content-Type'] = 'application/x-www-form-urlencoded'
+      const urlPath = config.url.replace('.do', '').replace('/', '')
+
+      // 非登录接口，将 token 注入 REQ_BODY
+      let reqBody = config.data
+      if (token && !config.url.includes('handleLogin')) {
+        reqBody = { ...config.data, token }
       }
-      return config
-    },
-    error => Promise.reject(error)
-  )
+
+      const requestBody = {
+        REQ_HEAD: {
+          TRANS_PROCESS: urlPath,
+          TRAN_ID: generateTraceNo()
+        },
+        REQ_BODY: reqBody
+      }
+      config.data = `REQ_MESSAGE=${encodeURIComponent(JSON.stringify(requestBody))}`
+    }
+    return config
+  },
+  error => Promise.reject(error)
 )
 
 service.interceptors.response.use(
@@ -120,7 +119,8 @@ service.interceptors.response.use(
 )
 
 const mockRequest = async (url, options = {}) => {
-  return await mockApi(url, options)
+  const res = await mockApi(url, options)
+  return res.RSP_BODY?.resultData ?? res
 }
 
 export { service, MOCK_MODE, mockRequest }

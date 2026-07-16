@@ -72,7 +72,7 @@ const useUserModel = () => {
   const fetchDeptTreeData = async () => {
     try {
       const deptId = localStorage.getItem('deptId')
-      const res = await getDeptTree({ deptId:deptId })
+      const res = await getDeptTree({ deptId: deptId })
       const list = Array.isArray(res) ? res : (res && typeof res === 'object' ? Object.values(res).filter(Boolean) : [])
       const map = {}
       const buildMap = (nodes) => {
@@ -174,7 +174,7 @@ const useUserModel = () => {
       setSubmitLoading(true)
       try {
         if (editingId) {
-          await updateUser({ ...values, id: editingId })
+          await updateUser({...values, id:editingId})
           message.success('更新成功')
         } else {
           await addUser(values)

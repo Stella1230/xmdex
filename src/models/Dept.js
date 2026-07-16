@@ -116,7 +116,7 @@ const useDeptModel = () => {
   const fetchDeptTree = async () => {
     try {
       const deptId = localStorage.getItem('deptId')
-      const res = await getDeptTree({ deptId:deptId })
+      const res = await getDeptTree({ deptId: deptId })
       let treeData = []
       if (Array.isArray(res)) {
         treeData = res
@@ -191,12 +191,13 @@ const useDeptModel = () => {
   const handleDelete = async (dept) => {
     if (loading) return
     try {
+      setLoading(true)
       await deleteDept({ id: dept.id })
       message.success('删除成功')
-      fetchData()
-      fetchDeptTree()
+      window.location.reload()
     } catch (e) {
       console.error(e)
+      setLoading(false)
       message.error(e.message || '删除失败，该部门可能存在子部门或已绑定用户')
     }
   }

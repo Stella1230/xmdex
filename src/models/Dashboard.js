@@ -26,13 +26,9 @@ const useDashboardModel = () => {
   const [recentTasks, setRecentTasks] = useState(cached?.recentTasks ?? [])
   const [recentLoading, setRecentLoading] = useState(false)
 
-  const hasCachedData = !!cached
-
   useEffect(() => {
-    if (!hasCachedData) {
-      fetchData()
-      fetchRecentTasks()
-    }
+    fetchData()
+    fetchRecentTasks()
     return () => {
       setPageCache(CACHE_KEY, { stats, chartData, trendData, recentTasks })
     }
@@ -83,11 +79,14 @@ const useDashboardModel = () => {
     }
   }
 
+  
+
   const fetchRecentTasks = async () => {
     setRecentLoading(true)
     try {
       const res = await getTodoTaskList({ ...getAuthParams(), pageNum: 1, pageSize: 10 })
-      const taskList = res?.rows || res || []
+      const pageData = res?.resultData || res || {}
+      const taskList = Array.isArray(pageData) ? pageData : (pageData.content || pageData.rows || [])
       const newRecentTasks = taskList.map((task, index) => ({
         ...task,
         key: task.taskId || index

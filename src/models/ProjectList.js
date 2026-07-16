@@ -137,7 +137,7 @@ const useProjectListModel = () => {
     setModalTitle('编辑项目')
     try {
       const res = await getTodoProject({ id: record.id })
-      form.setFieldsValue({ ...res, projectId: record.id })
+      form.setFieldsValue({...res, projectId:record.id})
       setModalVisible(true)
     } catch (e) {
       console.error(e)

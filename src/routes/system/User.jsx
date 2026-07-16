@@ -43,6 +43,7 @@ const User = () => {
     }
   ]
 
+  
   return (
     <div className="resize-layout">
       <div className="resize-left" style={{ width: leftWidth }}>

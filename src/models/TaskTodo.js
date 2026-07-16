@@ -17,7 +17,13 @@ const useTaskTodoModel = () => {
   const [loading, setLoading] = useState(false)
   const [data, setData] = useState([])
   const [projects, setProjects] = useState([])
+  const [projectLoading, setProjectLoading] = useState(false)
+  const projectPageRef = useRef(1)
+  const projectTotalRef = useRef(0)
   const [users, setUsers] = useState([])
+  const [userLoading, setUserLoading] = useState(false)
+  const userPageRef = useRef(1)
+  const userTotalRef = useRef(0)
   const [selectedDept, setSelectedDept] = useState(cached?.selectedDept ?? null)
   const [selectedDeptName, setSelectedDeptName] = useState(cached?.selectedDeptName ?? '')
   const [modalVisible, setModalVisible] = useState(false)
@@ -109,7 +115,8 @@ const useTaskTodoModel = () => {
       const query = { pageNum: p.current, pageSize: p.pageSize, ...queryParams, deptId: params.deptId || selectedDept }
       const res = await getTodoTaskList(query)
       const pageData = res.resultData || res
-      setData(pageData.content || pageData.rows || [])
+      const list = Array.isArray(pageData) ? pageData : (pageData.content || pageData.rows|| [])
+      setData(list)
       const newPag = { current: p.current, pageSize: p.pageSize, total: pageData.totalElements || pageData.total || 0 }
       paginationRef.current = newPag
       setPagination(newPag)
@@ -120,24 +127,51 @@ const useTaskTodoModel = () => {
     }
   }
 
-  const fetchProjects = async () => {
+  const fetchProjects = async (pageNum = 1, append = false) => {
     try {
-      const res = await getTodoProjectList({ pageNum: 1, pageSize: 100 })
+      setProjectLoading(true)
+      const deptId = localStorage.getItem('deptId')
+      const res = await getTodoProjectList({ pageNum, pageSize: 100, deptId })
       const pageData = res.resultData || res
-      setProjects(pageData.content || pageData.rows || [])
+      const list = Array.isArray(pageData) ? pageData : (pageData.content || pageData.rows|| [])
+      projectTotalRef.current = Array.isArray(pageData) ? list.length :( pageData.totalElements || pageData.total || 0)
+      projectPageRef.current = pageNum
+      setProjects(prev => append ? [...prev, ...list] : list)
     } catch (e) {
       console.error(e)
+      message.warning('项目列表加载失败，请刷新页面重试')
+    } finally {
+      setProjectLoading(false)
     }
   }
 
-  const fetchUsers = async () => {
+  const fetchMoreProjects = () => {
+    if (projectLoading) return
+    if (projects.length >= projectTotalRef.current) return
+    fetchProjects(projectPageRef.current + 1, true)
+  }
+
+  const fetchUsers = async (pageNum = 1, append = false) => {
     try {
-      const res = await getUserList({ pageNum: 1, pageSize: 100 })
+      setUserLoading(true)
+      const deptId = localStorage.getItem('deptId')
+      const res = await getUserList({ pageNum, pageSize: 100 , deptId})
       const pageData = res.resultData || res
-      setUsers(pageData.content || pageData.rows || [])
+      const list = Array.isArray(pageData) ? pageData : (pageData.content || pageData.rows|| [])
+      userTotalRef.current = Array.isArray(pageData) ? list.length :( pageData.totalElements || pageData.total || 0)
+      userPageRef.current = pageNum
+      setUsers(prev => append ? [...prev, ...list] : list)
     } catch (e) {
       console.error(e)
+    } finally {
+      setUserLoading(false)
     }
+  }
+
+  const fetchMoreUsers = () => {
+    if (userLoading) return
+    if (users.length >= userTotalRef.current) return
+    fetchUsers(userPageRef.current + 1, true)
   }
 
   const findDeptName = (tree, key) => {
@@ -185,7 +219,7 @@ const useTaskTodoModel = () => {
     setModalTitle('编辑任务')
     setEditingRecord(record)
     try {
-      const res = await getTodoTask({ id: record.taskId })
+      const res = await getTodoTask({ id: record.id })
       const dayjs = require('dayjs')
       form.setFieldsValue({ ...res, planFinishTime: res.planFinishTime ? dayjs(res.planFinishTime) : null })
       setModalVisible(true)
@@ -249,11 +283,11 @@ const useTaskTodoModel = () => {
   }
 
   return {
-    loading, data, projects, users, selectedDept, selectedDeptName, modalVisible, modalTitle,
+    loading, data, projects, projectLoading, users, userLoading, selectedDept, selectedDeptName, modalVisible, modalTitle,
     submitLoading, editingRecord, form, pagination, queryParams, deptTreeData,
     isAdmin, canAdd, canEdit, canDelete, canUpdateStatusOnly, filteredUsers,
     handleDeptSelect, handleQuery, handleAdd, handleEdit, handleStatusUpdate,
-    handleDelete, handleSubmit, handlePageChange, setSelectedDept, setModalVisible
+    handleDelete, handleSubmit, handlePageChange, setSelectedDept, setModalVisible, fetchMoreProjects, fetchMoreUsers
   }
 }
 

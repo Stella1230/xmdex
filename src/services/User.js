@@ -1,7 +1,4 @@
-import { service, MOCK_MODE } from './index'
-import { mockApi } from './Mock'
-
-const mockRequest = (url, options) => mockApi(url, options)
+import { service, MOCK_MODE, mockRequest } from './index'
 
 export const getUserList = (data) => MOCK_MODE ? mockRequest('/system/user/list.do', { method: 'POST', data }) : service.post('/queryUserList.do', data)
 

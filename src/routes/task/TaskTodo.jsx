@@ -14,14 +14,28 @@ const { TextArea } = Input
 const TaskTodo = () => {
   const model = useTaskTodoModel()
   const {
-    loading, data, projects, selectedDept, selectedDeptName, modalVisible, modalTitle,
+    loading, data, projects, projectLoading, users, userLoading, selectedDept, selectedDeptName, modalVisible, modalTitle,
     submitLoading, editingRecord, form, pagination, deptTreeData,
     canAdd, canEdit, canDelete, canUpdateStatusOnly, filteredUsers,
     handleDeptSelect, handleQuery, handleAdd, handleEdit, handleStatusUpdate,
-    handleDelete, handleSubmit, handlePageChange
+    handleDelete, handleSubmit, handlePageChange, fetchMoreProjects, fetchMoreUsers
   } = model
 
   const [leftWidth, onResizeStart] = useResizable(240)
+
+  const handleProjectScroll = (e) => {
+    const { scrollTop, scrollHeight, clientHeight } = e.target
+    if (scrollHeight - scrollTop - clientHeight < 10) {
+      fetchMoreProjects()
+    }
+  }
+
+  const handleUserScroll = (e) => {
+    const { scrollTop, scrollHeight, clientHeight } = e.target
+    if (scrollHeight - scrollTop - clientHeight < 10) {
+      fetchMoreUsers()
+    }
+  }
 
   const columns = [
     { title: '任务内容', dataIndex: 'taskContent', key: 'taskContent', ellipsis: true, width: 250 },
@@ -69,17 +83,17 @@ const TaskTodo = () => {
       <>
         <Form.Item name="taskId" hidden><Input /></Form.Item>
         <Form.Item name="taskContent" label="任务内容" rules={[{ required: true }]}><TextArea rows={3} /></Form.Item>
-        <Form.Item name="projectId" label="所属项目" rules={[{ required: true }]}>
-          <Select placeholder="请选择项目">{projects.map(p => <Option key={p.projectId} value={p.projectId}>{p.projectName}</Option>)}</Select>
+          <Form.Item name="projectId" label="所属项目" rules={[{ required: true, message: '请选择所属项目' }]} extra={!projectLoading && projects.length === 0 ? '暂无可选项目，请检查部门权限或联系管理员' : null}>
+          <Select placeholder="请选择项目" loading={projectLoading} onPopupScroll={handleProjectScroll}>{projects.map(p => <Option key={p.id} value={p.id}>{p.projectName}</Option>)}</Select>
         </Form.Item>
-        <Form.Item name="userId" label="负责人">
-          <Select placeholder="请选择负责人">
+        <Form.Item name="userId" label="负责人" rules={[{ required: true, message: '请选择负责人' }]}>
+          <Select placeholder="请选择负责人" loading={userLoading} onPopupScroll={handleUserScroll}>
             {filteredUsers.map(u => (
               <Option key={u.userId || u.id} value={u.userId || u.id}>{u.nickName || u.name}</Option>
             ))}
           </Select>
         </Form.Item>
-        <Form.Item name="planFinishTime" label="计划完成时间"><DatePicker style={{ width: '100%' }} /></Form.Item>
+        <Form.Item name="planFinishTime" label="计划完成时间" rules={[{ required: true, message: '请选择计划完成时间' }]}><DatePicker style={{ width: '100%' }} /></Form.Item>
         <Form.Item name="status" label="状态" initialValue="0">
           <Select>
             <Option value="0">待开始</Option>
@@ -92,6 +106,7 @@ const TaskTodo = () => {
     )
   }
 
+  
   return (
     <div className="resize-layout">
       <div className="resize-left" style={{ width: leftWidth }}>
@@ -112,8 +127,7 @@ const TaskTodo = () => {
           <Form layout="inline" onFinish={handleQuery} style={{ marginBottom: 16 }}>
             <Form.Item name="taskContent" label="任务内容"><Input placeholder="请输入" /></Form.Item>
             <Form.Item name="projectId" label="项目">
-              <Select placeholder="请选择" allowClear style={{ width: 150 }}><Option value="">全部</Option>{projects.map(p => <Option key={p.projectId} value={p.projectId}>{p.projectName}</Option>)}</Select>
-            </Form.Item>
+            <Select placeholder="请选择" allowClear style={{ width: 150 }} onPopupScroll={handleProjectScroll}><Option value="">全部</Option>{projects.map(p => <Option key={p.id} value={p.id}>{p.projectName}</Option>)}</Select>            </Form.Item>
             <Form.Item name="status" label="状态">
               <Select placeholder="请选择" allowClear style={{ width: 100 }}><Option value="">全部</Option><Option value="0">待开始</Option><Option value="1">进行中</Option><Option value="2">已完成</Option></Select>
             </Form.Item>

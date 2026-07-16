@@ -1,9 +1,6 @@
-import { service, MOCK_MODE } from './index'
-import { mockApi } from './Mock'
+import { service, MOCK_MODE, mockRequest } from './index'
 
-const mockRequest = (url, options) => mockApi(url, options)
-
-export const getDeptTree = (data) =>  MOCK_MODE? mockRequest('/system/dept/treeselect.do', { method: 'POST', data }): service.post('/queryDeptTree.do', data)
+export const getDeptTree = (data) => MOCK_MODE? mockRequest('/system/dept/treeselect.do', { method: 'POST', data }): service.post('/queryDeptTree.do', data)
 export const getDeptList = (data) => MOCK_MODE ? mockRequest('/system/dept/list.do', { method: 'POST', data }) : service.post('/queryDeptList.do', data || {})
 
 export const getDeptDetail = (data) => MOCK_MODE ? mockRequest('/system/dept/get.do', { method: 'POST', data }) : service.post('/queryDeptDetail.do', { id: data.id })

@@ -7,6 +7,7 @@ import './index.less'
 import App from './App'
 import ErrorBoundary from './components/ErrorBoundary'
 
+
 ReactDOM.render(
   <ConfigProvider locale={zhCN}>
     <ErrorBoundary>

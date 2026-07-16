@@ -212,6 +212,14 @@ const roleMenuAssignments = {
   ROLE_EMPLOYEE: ['MENU_DASHBOARD', 'MENU_TASK', 'MENU_TASK_LIST']
 }
 
+const wrapSuccess = (data) => ({
+  RSP_CODE: "000000",
+  RSP_MSG: "成功",
+  RSP_BODY: {
+    resultData: data
+  }
+})
+
 const sleep = (ms) => new Promise(resolve => setTimeout(resolve, ms))
 
 export const mockApi = async (url, options = {}) => {
@@ -358,7 +366,7 @@ export const mockApi = async (url, options = {}) => {
     result = {}
   }
 
-  return result
+  return wrapSuccess(result)
 }
 
 function flattenMenus(menus) {

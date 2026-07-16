@@ -7,10 +7,10 @@ import useDashboardModel from '../models/Dashboard'
 import './Dashboard.less'
 
 const recentColumns = [
-  { title: '任务标题', dataIndex: 'taskName', key: 'taskName', ellipsis: true, render: (v) => <Tooltip title={v}>{v}</Tooltip> },
+  { title: '任务内容', dataIndex: 'taskContent', key: 'taskContent', ellipsis: true, render: (v) => <Tooltip title={v}>{v}</Tooltip> },
   { title: '所属项目', dataIndex: 'projectName', key: 'projectName', width: 150, ellipsis: true },
-  { title: '负责人', dataIndex: 'assigneeName', key: 'assigneeName', width: 100 },
-  { title: '计划时间', dataIndex: 'planFinishTime', key: 'planFinishTime', width: 150 },
+  { title: '负责人', dataIndex: 'userName', key: 'userName', width: 100 },
+  { title: '计划时间', dataIndex: 'createTime', key: 'createTime', width: 150 },
   { title: '状态', dataIndex: 'status', key: 'status', width: 90, render: v => getStatusTag(v) }
 ]
 
