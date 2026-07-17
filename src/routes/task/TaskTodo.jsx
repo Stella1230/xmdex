@@ -42,9 +42,9 @@ const TaskTodo = () => {
     { title: '项目', dataIndex: 'projectName', key: 'projectName', width: 150 },
     { title: '负责人', dataIndex: 'realName', key: 'realName', width: 100 },
     { title: '状态', dataIndex: 'status', key: 'status', width: 80, render: v => getStatusTag(v) },
-    { title: '计划完成时间', dataIndex: 'planFinishTime', key: 'planFinishTime', width: 120, render: v => v ? dayjs(v).format('MM-DD') : '-' },
-    { title: '实际完成时间', dataIndex: 'finishTime', key: 'finishTime', width: 120, render: v => v ? dayjs(v).format('MM-DD HH:mm') : '-' },
-    { title: '创建时间', dataIndex: 'createTime', key: 'createTime', width: 150, render: v => v ? dayjs(v).format('YYYY-MM-DD HH:mm') : '-' },
+    { title: '计划完成时间', dataIndex: 'planFinishTime', key: 'planFinishTime', width: 120, render: v => v ? dayjs(v).format('YYYY-MM-DD HH:mm:ss') : '-' },
+    { title: '实际完成时间', dataIndex: 'finishTime', key: 'finishTime', width: 120, render: v => v ? dayjs(v).format('YYYY-MM-DD HH:mm:ss') : '-' },
+    { title: '创建时间', dataIndex: 'createTime', key: 'createTime', width: 150, render: v => v ? dayjs(v).format('YYYY-MM-DD HH:mm:ss') : '-' },
     {
       title: '操作', key: 'action', width: 200,
       render: (_, record) => (
