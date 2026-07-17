@@ -54,7 +54,7 @@ const TaskTodo = () => {
             <Button type="link" size="small" onClick={() => handleStatusUpdate(record)}>更新状态</Button>
           )}
           {canDelete && (
-            <Popconfirm title="确认删除?" onConfirm={() => handleDelete(record.taskId)}>
+            <Popconfirm title="确认删除?" onConfirm={() => handleDelete(record.id || record.taskId)}>
               <Button type="link" size="small" danger icon={<DeleteOutlined />}>删除</Button>
             </Popconfirm>
           )}
