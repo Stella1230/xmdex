@@ -21,7 +21,7 @@ const ProjectList = () => {
     { title: '项目名称', dataIndex: 'projectName', key: 'projectName', width: 200 },
     { title: '项目描述', dataIndex: 'projectDesc', key: 'projectDesc', ellipsis: true },
     { title: '完成度', dataIndex: 'completionRate', key: 'completionRate', width: 100, render: v => `${v || 0}%` },
-    { title: '创建时间', dataIndex: 'createTime', key: 'createTime', width: 180, render: v => v ? dayjs(v).format('YYYY-MM-DD HH:mm') : '-' },
+    { title: '创建时间', dataIndex: 'createTime', key: 'createTime', width: 180, render: v => v ? dayjs(v).format('YYYY-MM-DD HH:mm:ss') : '-' },
     {
       title: '操作', key: 'action', width: 150,
       render: (_, record) => (
