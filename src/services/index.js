@@ -1,6 +1,7 @@
 import axios from 'axios'
 import { message } from 'antd'
 import { mockApi } from './Mock'
+import dayjs from 'dayjs'
 
 const MOCK_MODE = process.env.REACT_APP_MOCK === 'true'
 
@@ -11,15 +12,9 @@ function generateTraceNo() {
 function formatDate(dateStr) {
   if (!dateStr) return ''
   try {
-    const date = new Date(dateStr)
-    if (isNaN(date.getTime())) return dateStr
-    const year = date.getFullYear()
-    const month = String(date.getMonth() + 1).padStart(2, '0')
-    const day = String(date.getDate()).padStart(2, '0')
-    const hours = String(date.getHours()).padStart(2, '0')
-    const minutes = String(date.getMinutes()).padStart(2, '0')
-    const seconds = String(date.getSeconds()).padStart(2, '0')
-    return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`
+    const d = dayjs(dateStr)
+    if (!d.isValid()) return dateStr
+    return d.format('YYYY-MM-DD HH:mm:ss')
   } catch (e) {
     return dateStr
   }
@@ -32,7 +27,7 @@ function formatDateFields(obj) {
   for (const key in obj) {
     if (obj.hasOwnProperty(key)) {
       const value = obj[key]
-      if (typeof value === 'string' && (key === 'createTime' || key === 'updateTime' || key === 'loginDate' || key === 'completeTime' || key === 'submitTime' || key === 'operTime' || key === 'loginTime')) {
+      if (typeof value === 'string' && (key === 'createTime' || key === 'updateTime' || key === 'loginDate' || key === 'completeTime' || key === 'submitTime' || key === 'operTime' || key === 'loginTime' || key === 'planFinishTime' || key === 'finishTime' || key === 'startDate' || key === 'deadline')) {
         newObj[key] = formatDate(value)
       } else if (Array.isArray(value)) {
         newObj[key] = value.map(item => formatDateFields(item))
