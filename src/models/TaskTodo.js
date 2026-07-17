@@ -221,7 +221,7 @@ const useTaskTodoModel = () => {
     try {
       const res = await getTodoTask({ id: record.id })
       const dayjs = require('dayjs')
-      form.setFieldsValue({ ...res, planFinishTime: res.planFinishTime ? dayjs(res.planFinishTime) : null })
+      form.setFieldsValue({ ...res, taskId: res.taskId || res.id, planFinishTime: res.planFinishTime ? dayjs(res.planFinishTime) : null })
       setModalVisible(true)
     } catch (e) {
       console.error(e)
@@ -255,9 +255,9 @@ const useTaskTodoModel = () => {
       if (canUpdateStatusOnly && editingRecord) {
         await updateTodoTask({ taskId: values.taskId, status: values.status })
         message.success('状态更新成功')
-      } else if (values.taskId) {
+      } else if (editingRecord) {
         const dayjs = require('dayjs')
-        const params = { ...values, planFinishTime: values.planFinishTime?.format('YYYY-MM-DD') }
+        const params = { ...values, id: editingRecord.taskId || editingRecord.id, planFinishTime: values.planFinishTime?.format('YYYY-MM-DD') }
         await updateTodoTask(params)
         message.success('更新成功')
       } else {
